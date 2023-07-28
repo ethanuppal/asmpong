@@ -11,8 +11,7 @@ TARGET	:= pong
 CONFIG	:= config
 
 $(TARGET): $(OBJ)
-	$(LD) -r $^ -o $@.o
-	$(CC) $@.o -o $@
+	$(CC) $^ -o $@
 
 $(CONFIG).nasm: $(CONFIG)
 	./$(CONFIG) > $(CONFIG).nasm

@@ -32,7 +32,7 @@ int main(void) {
     printf("\n");
     printf("%%macro $print 2\n");
     printf("    mov edi, M_STDOUT_FILENO\n");
-    printf("    mov rsi, %%1\n");
+    printf("    lea rsi, [rel %%1]\n");
     printf("    mov rdx, %%2\n");
     printf("    mov eax, M_SYS_WRITE\n");
     printf("    syscall\n");

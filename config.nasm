@@ -22,7 +22,7 @@
 
 %macro $print 2
     mov edi, M_STDOUT_FILENO
-    mov rsi, %1
+    lea rsi, [rel %1]
     mov rdx, %2
     mov eax, M_SYS_WRITE
     syscall

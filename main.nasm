@@ -4,17 +4,19 @@
 ; - _main
 
 %include "config.nasm"
-%include "struct_tui.nasm"
 
 section .text
+
+; int game(void);
+extern _game
 
 ; int main(void);
 global _main
 _main:
     call _handle_args
 _main.resume:
-    ; game code here
-    xor edi, edi
+    call _game
+    mov rdi, rax
 _main.exit:
     mov eax, M_SYS_EXIT
     syscall
@@ -24,26 +26,29 @@ _handle_args:
     jnz _handle_args.args_passed    ; argc == 1, i.e., no args
     jmp _main.resume
 _handle_args.args_passed:
-    mov rdx, [rsi+8]
-    lea r9, [rel help_flag]
-    xor eax, eax
+    mov rdx, [rsi+8]                ; char* arg = argv[1];
+    lea r9, [rel help_flag]         ; char* match = "-h";
+    xor eax, eax                    ; int i = 0;
 _handle_args.loop:
-    inc rax
-    mov r8b, [rdx+rax]
-    cmp r8b, 0
-    jz _handle_args.done_compare
-    cmp r8b, [r9+rax]
-    jnz _handle_args.done_compare
+    inc rax                         ; i++;
+    mov r8b, [rdx+rax]              ; char cur = arg[i];
+    cmp r8b, 0                      ; if (cur == 0)
+    jz _handle_args.done_compare    ;   goto done_compare;
+_handle_args.check_compare:
+    cmp r8b, [r9+rax]               ; if (cur != match[i])
+    jnz _handle_args.compare_error  ;   goto compare_error;
     jmp _handle_args.loop
 _handle_args.done_compare:
     cmp rax, help_flag_len
     jz _handle_args.print_help
+_handle_args.compare_error:
     $print argument_error, argument_error_len
     mov edi, 1
 _handle_args.finish_args:
     jmp _main.exit
 _handle_args.print_help:
     $print help_msg, help_msg_len
+    xor edi, edi
     jmp _handle_args.finish_args
 
 section .rodata

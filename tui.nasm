@@ -13,8 +13,10 @@ section .text
 
 extern _malloc
 extern _free
-
-;T.f=fcntl(I,F_GETFL);tcgetattr(O,&T.t);fcntl(I,F_SETFL,T.f|O_NONBLOCK);T.u=T.t;T.u.c_lflag&=~(ECHO|ICANON);tcsetattr(O,Y(SA),&T.u);T.p.fd=I;T.p.events=POLLIN;T.p.revents=0;T.b=malloc(W*H);memset(T.b,' ',W*H);
+extern _fcntl
+extern _tcgetattr
+extern _tcsetattr
+extern _memset
 
 ; void tui_begin()
 ;   rdi = struct tui* t;
@@ -22,17 +24,77 @@ extern _free
 ;   edx = int height;
 global _tui_begin
 _tui_begin:
-    mov [rdi], esi      ; t->width = width;
-    mov [rdi+4], edx    ; t->height = height;
-    ; mov [rdi+12]
+    mov r12, rdi
+
+    mov [r12+OFF_tui_width], esi     ; t->width = width;
+    mov [r12+OFF_tui_height], edx    ; t->height = height;
+
+    ; t->fcntl = fcntl(STDIN_FILENO, F_GETFL);
+    mov edi, M_STDIN_FILENO
+    mov esi, M_F_GETFL
+    call _fcntl
+    mov [r12+OFF_tui_fcntl], eax
+
+    ; tcgetattr(STDOUT_FILENO, &t->old);
+    mov edi, M_STDOUT_FILENO
+    lea rsi, [r12+OFF_tui_old]
+    call _tcgetattr
+
+    ; fcntl(STDIN_FILENO, F_SETFL, t->fcntl | O_NONBLOCK);
+    mov edi, M_STDIN_FILENO
+    mov esi, M_F_SETFL
+    mov edx, [r12+OFF_tui_fcntl]
+    or edx, M_O_NONBLOCK
+    call _fcntl
+
+    ; t->new = t->old; // inefficiently though...
+    mov edi, M_STDOUT_FILENO
+    lea rsi, [r12+OFF_tui_new]
+    call _tcgetattr
+
+    ; t->new.c_lflag &= ~(ECHO | ICANON);
+    lea rdi, [r12+OFF_tui_new+OFF_termios_cflag]
+    mov esi, [rdi]
+    and esi, ~(M_ECHO | M_ICANON)
+    mov [rdi], esi
+
+    ; tcsetattr(STDOUT_FILENO, TCSAFLUSH, &t->new)
+    mov edi, M_STDOUT_FILENO
+    mov esi, M_TCSAFLUSH
+    lea rdx, [r12+OFF_tui_old]
+    call _tcsetattr
+
+    ; t->polldf.fd = STDIN_FILENO;
+    mov dword [r12+OFF_tui_pollfd+OFF_pollfd_fd], M_STDIN_FILENO
+
+    ; t->polldf.events = POLLIN;
+    mov dword [r12+OFF_tui_pollfd+OFF_pollfd_events], M_POLLIN
+
+    ; t->polldf.revents = 0;
+    mov dword [r12+OFF_tui_pollfd+OFF_pollfd_revents], 0
+
+    ; t->buf = malloc(W * H);
+    mov rdi, W * H
+    call _malloc
+    mov [r12+OFF_tui_buf], rax
+
+    ; memset(t->buf, ' ', W * H);
+    mov rdi, rax
+    mov esi, ' '
+    mov rdx, W * H
+    call _memset
+
+    ; printf(HIDE_CURSOR);
     $print HIDE_CURSOR, HIDE_CURSOR_LEN
 
+    ret
+
 section .rodata
-    HIDE_CURSOR: db 'lol\n'
+    HIDE_CURSOR: db 27, '[?25l'
     HIDE_CURSOR_LEN: equ $ - HIDE_CURSOR
 
-    SHOW_CURSOR: db '\e[?25h'
+    SHOW_CURSOR: db 27, '[?25h'
     SHOW_CURSOR_LEN: equ $ - SHOW_CURSOR
 
-    GO_HOME: db '\e[H'
+    GO_HOME: db 27, '[H'
     GO_HOME_LEN: equ $ - GO_HOME

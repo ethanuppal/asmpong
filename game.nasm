@@ -10,10 +10,10 @@ section .text
 
 extern _malloc
 extern _free
-extern tui_begin
-extern tui_end
-extern tui_keys
-extern tui_draw
+extern _tui_begin
+extern _tui_end
+extern _tui_keys
+extern _tui_draw
 
 ; int game(void);
 ;   keep r12 = struct tui* tui;
@@ -24,6 +24,9 @@ _game:
     cmp rax, 0
     jz _game.error
     mov r12, rax
+    ; BEGIN GAME LOGIC (tui in r12)
+    call _tui_begin
+    ; END GAME LOGIC
     mov rdi, r12
     call _free
     xor eax, eax
@@ -34,5 +37,5 @@ _game.error:
     ret
 
 section .rodata
-    error_msg: db 'A problem occured while running the game', 10
+    error_msg: db 'A problem occured while running the game.', 10
     error_msg_len: equ $ - error_msg

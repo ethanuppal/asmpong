@@ -23,11 +23,13 @@ _game:
     call _malloc
     cmp rax, 0
     jz _game.error
-    mov r12, rax
+    mov rdi, rax
     ; BEGIN GAME LOGIC (tui in r12)
     call _tui_begin
+    mov rdi, rax
+    call _tui_end
     ; END GAME LOGIC
-    mov rdi, r12
+    mov rdi, rax
     call _free
     xor eax, eax
     ret

@@ -10,6 +10,18 @@ OBJ		:= $(SRC:.nasm=.o)
 TARGET	:= pong
 CONFIG	:= config
 
+.PHONY: run
+run:
+	make clean
+	make $(TARGET)
+	./$(TARGET)
+
+.PHONY: d
+d:
+	make clean
+	make $(TARGET)
+	lldb ./$(TARGET)
+
 $(TARGET): $(OBJ)
 	$(CC) $^ -o $@
 
@@ -22,5 +34,6 @@ $(CONFIG): $(CONFIG).c
 %.o: %.nasm $(CONFIG).nasm
 	$(NASM) $(NASMFL) $<
 
+.PHONY: clean
 clean:
 	rm -rf $(OBJ) $(TARGET) $(CONFIG) $(CONFIG).nasm

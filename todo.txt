@@ -1,0 +1,5 @@
+```
+$ ./pong -h -h -g
+usage: pong [-h]
+```
+this shouldn't work

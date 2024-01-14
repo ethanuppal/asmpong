@@ -21,6 +21,7 @@ _main.exit:
     mov eax, M_SYS_EXIT
     syscall
 
+; this function does not follow any calling convention.
 _handle_args:
     cmp edi, 1
     jnz _handle_args.args_passed    ; argc == 1, i.e., no args

@@ -19,23 +19,32 @@ extern _tui_draw
 ;   keep r12 = struct tui* tui;
 global _game
 _game:
+    push rbp
+    mov rbp, rsp
     mov rdi, SZ_STRUCT_TUI
-    call _malloc
-    cmp rax, 0
-    jz _game.error
-    mov rdi, rax
+    call _malloc        ; struct tui* rax = malloc(sizeof(struct tui));
+    cmp rax, 0          ; if (!tui)
+    jz _game.error      ;     game_error();
+    mov r12, rax        ; // <- r12 forever :sunglasses:
+    mov rdi, r12        
+    mov esi, W          
+    mov edx, H
     ; BEGIN GAME LOGIC (tui in r12)
-    call _tui_begin
-    mov rdi, rax
-    call _tui_end
+    call _tui_begin     ; tui_begin(tui /* mov rdi, r12 */, W, H);
+    mov rdi, r12
+    call _tui_end       ; tui_end(tui /* mov rdi, r12 */);
     ; END GAME LOGIC
     mov rdi, rax
     call _free
     xor eax, eax
+    mov rsp, rbp
+    pop rbp
     ret
 _game.error:
     $print error_msg, error_msg_len
     mov eax, 1
+    mov rsp, rbp
+    pop rbp
     ret
 
 section .rodata

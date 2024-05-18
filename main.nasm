@@ -60,7 +60,7 @@ _handle_args:
 section .rodata
     help_flag: db '-h', 0
     help_flag_len: equ $ - help_flag - 1
-    help_msg: db 'usage: pong [-h]', 10
+    help_msg: db "usage: pong [-h]", 10, 10, "Press 'q' to exit.", 10
     help_msg_len: equ $ - help_msg
-    argument_error: db 'error: Pass either no arguments or -h.', 10
+    argument_error: db "error: Pass either no arguments or '-h' for help.", 10
     argument_error_len: equ $ - argument_error

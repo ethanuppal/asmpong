@@ -51,3 +51,9 @@ test:
 	@echo '==> testing CLI'
 	@cd test; $(PY) main.py
 	@echo -e '\x1b[32m==> all tests passed!\x1b[m'
+
+.PHONY: format
+format:
+	for file in $(SRC); do \
+		sed -i '' -e 's/[[:space:]]*$$//' $$file; \
+	done

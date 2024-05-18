@@ -1,1 +1,1 @@
-error: Pass either no arguments or -h.
+error: Pass either no arguments or '-h' for help.

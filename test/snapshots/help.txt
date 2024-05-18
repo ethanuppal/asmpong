@@ -1,1 +1,3 @@
 usage: pong [-h]
+
+Press 'q' to exit.

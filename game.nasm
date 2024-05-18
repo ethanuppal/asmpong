@@ -23,21 +23,35 @@ global _game
 _game:
     push rbp
     mov rbp, rsp
+
+    ; make tui struct
     mov rdi, SZ_STRUCT_TUI
-    call _malloc        ; struct tui* rax = malloc(sizeof(struct tui));
+    call _malloc        ; struct tui* tui = malloc(sizeof(*tui)); // goes in rax
     cmp rax, 0          ; if (!tui)
     jz _game.error      ;     game_error();
-    mov r12, rax        ; // <- r12 forever :sunglasses:
-    mov rdi, r12        
-    mov esi, W          
+    mov r12, rax        ; // <- tui in r12 forever :sunglasses:
+
+    ; begin game (tui in r12)
+    mov rdi, r12
+    mov esi, W
     mov edx, H
-    ; BEGIN GAME LOGIC (tui in r12)
     call _tui_begin     ; tui_begin(tui /* mov rdi, r12 */, W, H);
+
+    ; game loop
+.loop:                
+    mov rdi, r12                    ; while (true) {
+    call _tui_keys                  ;     tui_keys(tui);
+    cmp byte [r12 + OFF_tui_c], 'q' ;     if (tui->c == 'q')
+    je .end                         ;         goto end;
+    jmp _game.loop                  ; }
+
+.end:
+    ; end game
     mov rdi, r12
     call _tui_end       ; tui_end(tui /* mov rdi, r12 */);
-    ; END GAME LOGIC
-    mov rdi, rax
-    call _free
+    mov rdi, r12
+    call _free          ; free(tui);
+
     xor eax, eax
     mov rsp, rbp
     pop rbp
@@ -50,5 +64,5 @@ _game:
     ret
 
 section .rodata
-    error_msg: db 'A problem occured while running the game.', 10
+    error_msg: db "A problem occured while running the game :(", 10
     error_msg_len: equ $ - error_msg

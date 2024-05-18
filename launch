@@ -24,4 +24,6 @@ if __name__ == '__main__':
     program_args = ' '.join(sys.argv[1:])
 
     cmd('make pong')
-    cmd(f'./pong {program_args}', surpress_output=False)
+    
+    if sys.argv[1] != 'MAKE':
+        cmd(f'./pong {program_args}', surpress_output=False)

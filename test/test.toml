@@ -1,6 +1,6 @@
 dir = '..'
 loc = 'snapshots'
-init = './launch'
+init = './launch MAKE'
 
 [[test]]
 command = './launch -h'

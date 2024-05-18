@@ -14,7 +14,7 @@ It's built for a 30x80 terminal.
 - `poll`
 - `read`
 
-This list will diminish over time as I reduce dependencies on the C/POSIX.
+This list will diminish over time as I reduce dependencies on the C/POSIX library, but likely not by much.
 
 **There's PYTHON! What's that about?**
 
@@ -38,6 +38,8 @@ Pass `-h` to view usage information:
 ```sh
 ./launch -h
 ```
+
+A cross-platform (that is, Intel vs. Silicon) `make` can be done using `./launch MAKE`.
 
 ## Testing
 

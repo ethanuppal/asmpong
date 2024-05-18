@@ -47,11 +47,11 @@ clean:
 test:
 	@echo '==> checking python dependencies'
 	@cd test; $(PY) check_deps.py 2>&1 >/dev/null \
-		|| (echo -e '\x1b[31m[!] dependencies not installed\x1b[m' && exit 1) \
+		|| (printf '\x1b[31m[!] dependencies not installed\x1b[m\n' && exit 1) \
 		&& (printf '\x1b[32m==> dependencies installed\x1b[m\n')
 	@echo '==> testing CLI'
 	@cd test; $(PY) main.py
-	@echo -e '\x1b[32m==> all tests passed!\x1b[m'
+	@printf '\x1b[32m==> all tests passed!\x1b[m\n'
 
 .PHONY: format
 format:

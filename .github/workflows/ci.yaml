@@ -15,8 +15,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Install System Dependencies
-        run: brew install nasm 
+      - name: Install Dependencies
+        run: brew install nasm
+        run: pip3 install toml
       - name: Build
         run: ./launch MAKE
       - name: Test

@@ -11,6 +11,8 @@
 ;   struct termios new;
 ; };
 
+bits 64
+
 %define OFF_tui_width 0
 %define OFF_tui_height 4
 %define OFF_tui_c 8

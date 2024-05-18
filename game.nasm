@@ -3,6 +3,8 @@
 ; game.nasm:
 ; - _game
 
+bits 64
+
 %include "config.nasm"
 %include "struct_tui.nasm"
 
@@ -40,7 +42,7 @@ _game:
     mov rsp, rbp
     pop rbp
     ret
-_game.error:
+.error:
     $print error_msg, error_msg_len
     mov eax, 1
     mov rsp, rbp

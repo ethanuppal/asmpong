@@ -1,0 +1,31 @@
+dir = '..'
+loc = 'snapshots'
+init = './launch'
+
+[[test]]
+command = './launch -h'
+output = 'help.txt'
+
+[[test]]
+command = './launch -g'
+output = 'badarg.txt'
+
+[[test]]
+command = './launch -h -g'
+output = 'badarg.txt'
+
+[[test]]
+command = './launch -h -h'
+output = 'badarg.txt'
+
+[[test]]
+command = './launch -h -h -h'
+output = 'badarg.txt'
+
+[[test]]
+command = './launch -hh'
+output = 'badarg.txt'
+
+[[test]]
+command = './launch -long'
+output = 'badarg.txt'

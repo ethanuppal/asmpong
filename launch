@@ -1,0 +1,27 @@
+#!/usr/bin/python3
+
+import sys
+import subprocess
+
+def cmd(command, print_commands = False, surpress_output = True):
+    """
+    Assumes `command` is a (precisely) space-separated string of arguments.
+    """
+    surpress = ' 2>&1 >/dev/null' if surpress_output else ''
+    command = f'{prefix}{command}'
+    if print_commands:
+        print(command)
+    exit_code = subprocess.call(command + surpress, shell=True)
+    if exit_code != 0:
+        sys.exit(exit_code)
+
+if __name__ == '__main__':
+    uname = str(subprocess.check_output(['uname', '-a']))
+    prefix = ''
+    if 'arm' in uname:
+        prefix = 'arch -x86_64 '
+
+    program_args = ' '.join(sys.argv[1:])
+
+    cmd('make pong')
+    cmd(f'./pong {program_args}', surpress_output=False)

@@ -6,6 +6,8 @@
 ; - tui_keys
 ; - tui_draw
 
+bits 64
+
 %include "config.nasm"
 %include "struct_tui.nasm"
 

@@ -3,6 +3,8 @@
 ; main.nasm:
 ; - _main
 
+bits 64
+
 %include "config.nasm"
 
 section .text
@@ -10,44 +12,47 @@ section .text
 ; int game(void);
 extern _game
 
-; int main(void);
+; int main(int argc, char** argv);
 global _main
 _main:
     call _handle_args
-_main.resume:
+.resume:
     call _game
     mov rdi, rax
-_main.exit:
+.exit:
     mov eax, M_SYS_EXIT
     syscall
 
-; this function does not follow any calling convention.
+; _handle_args(edi = argc, rsi = argv):
+; (this "function" does not follow any calling convention)
 _handle_args:
+    cmp edi, 2
+    je _handle_args.args_passed     ; if argc == 2      // one arg
     cmp edi, 1
-    jnz _handle_args.args_passed    ; argc == 1, i.e., no args
-    jmp _main.resume
-_handle_args.args_passed:
-    mov rdx, [rsi+8]                ; char* arg = argv[1];
+    je _main.resume                 ; if argc == 1      // no args
+    jmp .error_exit                 ; goto error_exit   // not valid
+.args_passed:
+    mov rdx, [rsi + 8]              ; char* arg = argv[1];
     lea r9, [rel help_flag]         ; char* match = "-h";
     xor eax, eax                    ; int i = 0;
-_handle_args.loop:
+.loop:
     inc rax                         ; i++;
-    mov r8b, [rdx+rax]              ; char cur = arg[i];
-    cmp r8b, 0                      ; if (cur == 0)
-    jz _handle_args.done_compare    ;   goto done_compare;
-_handle_args.check_compare:
-    cmp r8b, [r9+rax]               ; if (cur != match[i])
-    jnz _handle_args.compare_error  ;   goto compare_error;
+    mov r8b, [rdx + rax]            ; char cur = arg[i];
+    mov r10b, [r9 + rax]            ; char exp = match[i];
+    cmp r8b, r10b                   ; if (cur != exp)
+    jne .error_exit                 ;   goto error_exit
+    cmp r10b, 0                     ; if (cur == 0)
+    jz .done_compare                ;   goto done_compare;
     jmp _handle_args.loop
-_handle_args.done_compare:
+.done_compare:
     cmp rax, help_flag_len
     jz _handle_args.print_help
-_handle_args.compare_error:
+.error_exit:
     $print argument_error, argument_error_len
     mov edi, 1
-_handle_args.finish_args:
+.finish_args:
     jmp _main.exit
-_handle_args.print_help:
+.print_help:
     $print help_msg, help_msg_len
     xor edi, edi
     jmp _handle_args.finish_args

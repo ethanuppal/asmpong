@@ -16,8 +16,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Install Dependencies
-        run: brew install nasm
-        run: pip3 install toml
+        run: brew install nasm && pip3 install toml
       - name: Build
         run: ./launch MAKE
       - name: Test

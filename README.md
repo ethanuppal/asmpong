@@ -41,4 +41,4 @@ Pass `-h` to view usage information:
 
 ## Testing
 
-Run `make test` to run the CLI tests, which depend on [`tomllib`](https://docs.python.org/3/library/tomllib.html).
+Run `make test` to run the CLI tests, which depend on [`toml`](https://pypi.org/project/toml/).

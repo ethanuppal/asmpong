@@ -1,5 +1,7 @@
 # asmpong
 
+![CI Badge](https://github.com/ethanuppal/asmpong/actions/workflows/ci.yaml/badge.svg)
+
 I'd never made a game in "pure" x86 assembly, so I decided I wanted to.
 It's built for a 30x80 terminal.
 

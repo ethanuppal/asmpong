@@ -23,8 +23,8 @@ int main(void) {
     printf("\n");
     printf("bits 64\n");
     printf("\n");
-    printf("%%define W 50\n");
-    printf("%%define H 50\n");
+    printf("%%define W 80\n");
+    printf("%%define H 30\n");
     printf("\n");
     printf("%%define SZ_STRUCT_TERMIOS %zu\n", sizeof(struct termios));
     printf("%%define SZ_STRUCT_POLLFD %zu\n", sizeof(struct pollfd));

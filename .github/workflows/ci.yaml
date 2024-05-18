@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  build_and_test:
+    strategy:
+      matrix:
+        os: [macos-14, macos-13, macos-12]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install System Dependencies
+        run: brew install nasm 
+      - name: Install Python Dependencies
+        run: $(which pip3 || which pip) install toml
+      - name: Build
+        run: ./launch MAKE
+      - name: Test
+        run: make test

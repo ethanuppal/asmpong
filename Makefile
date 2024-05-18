@@ -1,11 +1,10 @@
 # Copyright (C) 2023-4 Ethan Uppal. All rights reserved.
 
 NASM	:= $(shell which nasm)
-CC		:= $(shell which gcc || which clang)
-CCX86	:= $(shell which clang)
+CC		:= $(shell which clang || which gcc)
+CFLAGS	:= -target x86_64-apple
 
-LD		:= ld
-NASMFL	:= -f macho64
+NASMFL	:= -fmacho64
 
 SRC		:= $(shell find . -type f -name "*.nasm")
 OBJ		:= $(SRC:.nasm=.o)
@@ -26,8 +25,10 @@ d:
 	make $(TARGET)
 	lldb ./$(TARGET)
 
+# -Wl,-w surpresses 'ld: warning: no platform load...' by disabling warnings
+# in the linker.
 $(TARGET): $(OBJ)
-	$(CCX86) $^ -o $@
+	$(CC) $(CFLAGS) $^ -o $@ -Wl,-w
 
 $(CONFIG).nasm: $(CONFIG)
 	./$(CONFIG) > $(CONFIG).nasm

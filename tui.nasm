@@ -45,7 +45,7 @@ extern _tcflush
 
 %macro $tui_loop_r13_r14_end 1
     jmp %1.v_loop
-%1.v_loop_exit: 
+%1.v_loop_exit:
 %endmacro
 
 ; void tui_begin(struct tui* t, int width, int height)
@@ -217,7 +217,7 @@ _tui_draw:
     call _putchar
 
     ; for (int i = 0; i < t->h; i++) {
-    ;     for (int j = 0; j < t->w; j++) 
+    ;     for (int j = 0; j < t->w; j++)
     ;         putchar(t->b[i * t->w + j]);
     ;     putchar('\n');
     ; }

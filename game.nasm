@@ -44,7 +44,7 @@ _game:
     call _tui_fill
 
     ; game loop
-.loop:                              ; ; while (true) {      
+.loop:                              ; ; while (true) {
     mov rdi, r12
     call _tui_keys                  ;     tui_keys(tui);
     cmp byte [r12 + OFF_tui_c], 'q' ;     if (tui->c == 'q')

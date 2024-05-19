@@ -208,13 +208,13 @@ _tui_draw:
     mov r12, rdi
 
     ; printf("\e[H");
-    $print GO_HOME, GO_HOME_LEN
-    ; mov edi, 27
-    ; call _putchar
-    ; mov edi, '['
-    ; call _putchar
-    ; mov edi, 'H'
-    ; call _putchar
+    ; $print GO_HOME, GO_HOME_LEN
+    mov edi, 27
+    call _putchar
+    mov edi, '['
+    call _putchar
+    mov edi, 'H'
+    call _putchar
 
     ; for (int i = 0; i < t->h; i++) {
     ;     for (int j = 0; j < t->w; j++) 
@@ -235,6 +235,7 @@ _tui_draw:
     mov edi, 10
     call _putchar
     $tui_loop_r13_r14_end _tui_draw
+
 
     ; tcflush(STDOUT_FILENO, TCIOFLUSH)
     mov edi, M_STDOUT_FILENO

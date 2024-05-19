@@ -13,7 +13,7 @@ def cmd(command, print_commands = False, surpress_output = True):
         print(command)
     exit_code = subprocess.call(command + surpress, shell=True)
     if exit_code != 0:
-        print(f"==> command '{command}' failed with exit code {exit_code}")
+        print(f"==> command '{command}' failed with exit code {exit_code}", file=sys.stderr)
         sys.exit(exit_code)
 
 if __name__ == '__main__':

@@ -13,7 +13,7 @@ with open('./test.toml', 'r') as test_config_file:
         with open(loc + '/'+ output_path, 'r') as output_file:
             expected = output_file.read()
             process = subprocess.run(f'cd {dir} && ' + command, shell=True, capture_output=True)
-            actual = process.stdout.decode('utf-8')
+            actual = process.stdout.decode('ascii')
             print(f'    \x1b[33mASSERT $(cat {loc}/{output_path}) == $({command})\x1b[m')
             if expected != actual:
                 did_fail = True

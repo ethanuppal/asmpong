@@ -9,6 +9,7 @@ bits 64
 %include "struct_tui.nasm"
 
 section .text
+    align 16
 
 extern _malloc
 extern _free
@@ -16,6 +17,7 @@ extern _tui_begin
 extern _tui_end
 extern _tui_keys
 extern _tui_draw
+extern _tui_fill
 
 ; int game(void);
 ;   keep r12 = struct tui* tui;
@@ -37,12 +39,20 @@ _game:
     mov edx, H
     call _tui_begin     ; tui_begin(tui /* mov rdi, r12 */, W, H);
 
+    mov rdi, r12
+    mov sil, '#'
+    call _tui_fill
+
     ; game loop
-.loop:                
-    mov rdi, r12                    ; while (true) {
+.loop:                              ; ; while (true) {
+    mov rdi, r12
     call _tui_keys                  ;     tui_keys(tui);
     cmp byte [r12 + OFF_tui_c], 'q' ;     if (tui->c == 'q')
     je .end                         ;         goto end;
+    mov rdi, r12
+    call _tui_draw                  ;     tui_draw(tui);
+    cmp rax, 0
+    jne _game.error
     jmp _game.loop                  ; }
 
 .end:
@@ -64,5 +74,7 @@ _game:
     ret
 
 section .rodata
+    align 16
+
     error_msg: db "A problem occured while running the game :(", 10
     error_msg_len: equ $ - error_msg

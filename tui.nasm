@@ -6,15 +6,13 @@
 ; - tui_keys
 ; - tui_draw
 
-; I realized that I probably don't need to be pushing r12-15 etc and using them,
-; but it is what it is.
-
 bits 64
 
 %include "config.nasm"
 %include "struct_tui.nasm"
 
 section .text
+    align 16
 
 extern _malloc
 extern _free
@@ -123,6 +121,8 @@ _tui_begin:
     ; printf("%s", HIDE_CURSOR);
     $print HIDE_CURSOR, HIDE_CURSOR_LEN
 
+    $print GO_HOME, GO_HOME_LEN
+
     mov rsp, rbp
     pop rbp
     ret
@@ -209,6 +209,12 @@ _tui_draw:
 
     ; printf("\e[H");
     $print GO_HOME, GO_HOME_LEN
+    ; mov edi, 27
+    ; call _putchar
+    ; mov edi, '['
+    ; call _putchar
+    ; mov edi, 'H'
+    ; call _putchar
 
     ; for (int i = 0; i < t->h; i++) {
     ;     for (int j = 0; j < t->w; j++) 
@@ -226,12 +232,12 @@ _tui_draw:
     mov dil, [r15 + rsi]                ; rdi = t->b[rdi]
     call _putchar
     $tui_loop_r13_r14_between _tui_draw
-    mov edi, '\n'
+    mov edi, 10
     call _putchar
     $tui_loop_r13_r14_end _tui_draw
 
     ; tcflush(STDOUT_FILENO, TCIOFLUSH)
-    mov edi, M_STDIN_FILENO
+    mov edi, M_STDOUT_FILENO
     mov esi, M_TCIOFLUSH
     call _tcflush
 
@@ -267,11 +273,13 @@ _tui_fill:
     ret
 
 section .rodata
+    align 16
+
     HIDE_CURSOR: db 27, "[?25l"
     HIDE_CURSOR_LEN: equ $ - HIDE_CURSOR
 
     SHOW_CURSOR: db 27, "[?25h"
     SHOW_CURSOR_LEN: equ $ - SHOW_CURSOR
 
-    GO_HOME: db 27, "[H"
+    GO_HOME: db 27, "[1;1H"
     GO_HOME_LEN: equ $ - GO_HOME

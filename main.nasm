@@ -8,6 +8,7 @@ bits 64
 %include "config.nasm"
 
 section .text
+    align 16
 
 ; int game(void);
 extern _game
@@ -58,6 +59,8 @@ _handle_args:
     jmp _handle_args.finish_args
 
 section .rodata
+    align 16
+    
     help_flag: db '-h', 0
     help_flag_len: equ $ - help_flag - 1
     help_msg: db "usage: pong [-h]", 10, 10, "Press 'q' to exit.", 10

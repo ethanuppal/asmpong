@@ -9,6 +9,7 @@ bits 64
 %include "struct_tui.nasm"
 
 section .text
+    align 16
 
 extern _malloc
 extern _free
@@ -48,8 +49,10 @@ _game:
     call _tui_keys                  ;     tui_keys(tui);
     cmp byte [r12 + OFF_tui_c], 'q' ;     if (tui->c == 'q')
     je .end                         ;         goto end;
-    mov rdi, 12
+    mov rdi, r12
     call _tui_draw                  ;     tui_draw(tui);
+    cmp rax, 0
+    jne _game.error
     jmp _game.loop                  ; }
 
 .end:
@@ -71,5 +74,7 @@ _game:
     ret
 
 section .rodata
+    align 16
+
     error_msg: db "A problem occured while running the game :(", 10
     error_msg_len: equ $ - error_msg

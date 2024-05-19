@@ -31,11 +31,11 @@ extern _tcflush
     xor r13d, r13d
 %1.v_loop:
     cmp r13, [r12 + OFF_tui_height]
-    jge %1.v_loop_exit
+    je %1.v_loop_exit
     xor r14d, r14d
 %1.h_loop:
     cmp r14, [r12 + OFF_tui_width]
-    jge %1.h_loop_exit
+    je %1.h_loop_exit
 %endmacro
 
 %macro $tui_loop_r13_r14_between 1
@@ -62,8 +62,8 @@ _tui_begin:
     push r12        ; callee must save
     mov r12, rdi
 
-    mov [r12 + OFF_tui_width], esi      ; t->width = width;
-    mov [r12 + OFF_tui_height], edx     ; t->height = height;
+    mov [r12 + OFF_tui_width], rsi      ; t->width = width;
+    mov [r12 + OFF_tui_height], rdx     ; t->height = height;
 
     ; t->fcntl = fcntl(STDIN_FILENO, F_GETFL);
     mov edi, M_STDIN_FILENO

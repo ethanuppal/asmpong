@@ -16,6 +16,7 @@ extern _tui_begin
 extern _tui_end
 extern _tui_keys
 extern _tui_draw
+extern _tui_fill
 
 ; int game(void);
 ;   keep r12 = struct tui* tui;
@@ -37,12 +38,18 @@ _game:
     mov edx, H
     call _tui_begin     ; tui_begin(tui /* mov rdi, r12 */, W, H);
 
+    mov rdi, r12
+    mov sil, '#'
+    call _tui_fill
+
     ; game loop
-.loop:                
-    mov rdi, r12                    ; while (true) {
+.loop:                              ; ; while (true) {      
+    mov rdi, r12
     call _tui_keys                  ;     tui_keys(tui);
     cmp byte [r12 + OFF_tui_c], 'q' ;     if (tui->c == 'q')
     je .end                         ;         goto end;
+    mov rdi, 12
+    call _tui_draw                  ;     tui_draw(tui);
     jmp _game.loop                  ; }
 
 .end:

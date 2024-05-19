@@ -6,6 +6,9 @@
 ; - tui_keys
 ; - tui_draw
 
+; I realized that I probably don't need to be pushing r12-15 etc and using them,
+; but it is what it is.
+
 bits 64
 
 %include "config.nasm"
@@ -21,6 +24,31 @@ extern _tcsetattr
 extern _memset
 extern _poll
 extern _read
+extern _putchar
+extern _tcflush
+
+%macro $tui_loop_r13_r14_start 1
+    xor r13d, r13d
+%1.v_loop:
+    cmp r13, [r12 + OFF_tui_height]
+    jge %1.v_loop_exit
+    xor r14d, r14d
+%1.h_loop:
+    cmp r14, [r12 + OFF_tui_width]
+    jge %1.h_loop_exit
+%endmacro
+
+%macro $tui_loop_r13_r14_between 1
+    inc r14
+    jmp %1.h_loop
+%1.h_loop_exit:
+    inc r13
+%endmacro
+
+%macro $tui_loop_r13_r14_end 1
+    jmp %1.v_loop
+%1.v_loop_exit: 
+%endmacro
 
 ; void tui_begin(struct tui* t, int width, int height)
 ;   rdi = struct tui* t;
@@ -173,16 +201,66 @@ global _tui_draw
 _tui_draw:
     push rbp
     mov rbp, rsp
-    sub rsp, 8      ; stack alignment (see next instruction)
     push r12        ; callee must save
+    push r13
+    push r14
+    push r15
     mov r12, rdi
 
-; printf("\e[H");
-; for (int i = 0; i < t->h; i++) {
-;     for (int j = 0; j < t->w; j++) putchar(t->b[i * t->w + j]);
-;     putchar('\n');
-; }
-; tcflush(STDOUT_FILENO, TCIOFLUSH)
+    ; printf("\e[H");
+    $print GO_HOME, GO_HOME_LEN
+
+    ; for (int i = 0; i < t->h; i++) {
+    ;     for (int j = 0; j < t->w; j++) 
+    ;         putchar(t->b[i * t->w + j]);
+    ;     putchar('\n');
+    ; }
+    $tui_loop_r13_r14_start _tui_draw
+    mov r15, [r12 + OFF_tui_buf]        ; r15 = t->b
+    mov rdi, r13                        ; rdi = i
+    mov rsi, [r12 + OFF_tui_width]      ; rsi = t->w
+    imul rdi, rsi                       ; rdi = i * t->w
+    add rdi, r14                        ; rdi = i * t->w + j
+    mov rsi, rdi
+    xor edi, edi
+    mov dil, [r15 + rsi]                ; rdi = t->b[rdi]
+    call _putchar
+    $tui_loop_r13_r14_between _tui_draw
+    mov edi, '\n'
+    call _putchar
+    $tui_loop_r13_r14_end _tui_draw
+
+    ; tcflush(STDOUT_FILENO, TCIOFLUSH)
+    mov edi, M_STDIN_FILENO
+    mov esi, M_TCIOFLUSH
+    call _tcflush
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+; void tui_fill(struct tui* t, char fill)
+;   rdi = struct tui* t;
+;   sil = char fill;
+global _tui_fill
+_tui_fill:
+    push rbp
+    mov rbp, rsp
+    push r12        ; callee must save
+    push r13
+    push r14
+    push r15
+    mov r12, rdi
+    mov r15, [r12 + OFF_tui_buf]        ; r15 = t->b
+
+    $tui_loop_r13_r14_start _tui_fill
+    mov rdi, r13                        ; rdi = i
+    mov rdx, [r12 + OFF_tui_width]      ; rdx = t->w
+    imul rdi, rdx                       ; rdi = i * t->w
+    add rdi, r14                        ; rdi = i * t->w + j
+    mov [r15 + rdi], sil                ; t->b[rdi] = (char)rsi
+    $tui_loop_r13_r14_between _tui_fill
+    $tui_loop_r13_r14_end _tui_fill
 
     mov rsp, rbp
     pop rbp

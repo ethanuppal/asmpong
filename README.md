@@ -46,3 +46,8 @@ A cross-platform (that is, Intel vs. Silicon) `make` can be done using `./launch
 ## Testing
 
 Run `make test` to run the CLI tests, which depend on [`toml`](https://pypi.org/project/toml/).
+
+## Known Issues
+
+The quality of the assembly is not the greatest because I have merely attempted to get the project working.
+I may later return to improve it.
